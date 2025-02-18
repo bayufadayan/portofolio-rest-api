@@ -1,17 +1,17 @@
 package main
 
 import (
-	"github.com/gin-gonic/gin"
-	"portofolio-rest-api/internal/api"  // Sesuaikan dengan path project kamu
-	"portofolio-rest-api/internal/service"
+	"portofolio-rest-api/infrastructure"
+	"portofolio-rest-api/internal/api"
 )
 
 func main() {
-	service.InitDB()
+	// Koneksi Database
+	db := infrastructure.NewDBConnection()
+	sqlDB, _ := db.DB()
+	defer sqlDB.Close()
 
-	r := gin.Default()
-
-	api.InitRoutes(r)
-
-	r.Run(":8080")
+	// Setup Routes
+	router := api.InitRoutes(db)
+	router.Run(":8080")
 }
