@@ -12,8 +12,9 @@ import (
 )
 
 type Handlers struct {
-	JobTitleHandler    handler.JobTitleHandler
-	SocialMediaHandler handler.SocialMediaHandler
+	JobTitleHandler            handler.JobTitleHandler
+	SocialMediaHandler         handler.SocialMediaHandler
+	PersonalInformationHandler handler.PersonalInformationHandler
 }
 
 func InitRoutes(db *gorm.DB) *gin.Engine {
@@ -31,9 +32,15 @@ func initHandler(db *gorm.DB) *Handlers {
 	socialMediaService := service.NewSocialMediaService(socialMediaRepository)
 	socialMediaHandler := handler.NewSocialMediaHandler(socialMediaService)
 
+	// SocialMedia
+	personalInformationRepository := repository.NewPersonalInformationRepository(db)
+	personalInformationService := service.NewPersonalInformationService(personalInformationRepository)
+	personalInformationHandler := handler.NewPersonalInformationHandler(personalInformationService)
+
 	return &Handlers{
-		JobTitleHandler:    *jobTitleHandler,
-		SocialMediaHandler: *socialMediaHandler,
+		JobTitleHandler:            *jobTitleHandler,
+		SocialMediaHandler:         *socialMediaHandler,
+		PersonalInformationHandler: *personalInformationHandler,
 	}
 }
 
@@ -65,6 +72,14 @@ func setupRoutes(handler Handlers) *gin.Engine {
 	socialMedia.POST("", handler.SocialMediaHandler.Create)
 	socialMedia.PATCH("/:id", handler.SocialMediaHandler.Update)
 	socialMedia.DELETE("/:id", handler.SocialMediaHandler.Delete)
+
+	// PersonalInformation
+	personalInformation := api.Group("/personal-informations")
+	personalInformation.GET("", handler.PersonalInformationHandler.GetAll)
+	personalInformation.GET("/:id", handler.PersonalInformationHandler.GetById)
+	personalInformation.POST("", handler.PersonalInformationHandler.Create)
+	personalInformation.PATCH("/:id", handler.PersonalInformationHandler.Update)
+	personalInformation.DELETE("/:id", handler.PersonalInformationHandler.Delete)
 
 	return router
 }
