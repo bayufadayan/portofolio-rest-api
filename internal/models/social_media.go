@@ -17,5 +17,4 @@ type SocialMedia struct {
 	Platform              string          `gorm:"type:varchar(100);not null"`
 	Type                  SocialMediaType `gorm:"type:social_media_type;not null"`
 	URL                   string          `gorm:"type:varchar(255);not null"`
-	PersonalInformationID uint            `gorm:"not null"`
 }

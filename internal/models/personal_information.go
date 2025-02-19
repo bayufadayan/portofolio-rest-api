@@ -12,6 +12,4 @@ type PersonalInformation struct {
 	Address       string        `gorm:"type:text"`
 	Description   string        `gorm:"type:text"`
 	ProfileImage  string        `gorm:"type:varchar(255);not null"`
-	SocialMedias []SocialMedia  `gorm:"foreignKey:PersonalInformationID"`
-	JobTitles    []JobTitle     `gorm:"foreignKey:PersonalInformationID"`
 }

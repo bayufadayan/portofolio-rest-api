@@ -6,6 +6,5 @@ import (
 
 type JobTitle struct {
 	gorm.Model
-	Title                 string `gorm:"type:varchar(100);not null"`
-	PersonalInformationID uint   `gorm:"not null"`
+	Title string `json:"title" binding:"required" gorm:"type:varchar(100);not null;unique"`
 }
