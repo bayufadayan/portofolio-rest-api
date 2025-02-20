@@ -15,6 +15,7 @@ type Handlers struct {
 	JobTitleHandler            handler.JobTitleHandler
 	SocialMediaHandler         handler.SocialMediaHandler
 	PersonalInformationHandler handler.PersonalInformationHandler
+	CertificateHandler         handler.CertificateHandler
 }
 
 func InitRoutes(db *gorm.DB) *gin.Engine {
@@ -32,15 +33,21 @@ func initHandler(db *gorm.DB) *Handlers {
 	socialMediaService := service.NewSocialMediaService(socialMediaRepository)
 	socialMediaHandler := handler.NewSocialMediaHandler(socialMediaService)
 
-	// SocialMedia
+	// PersonalInformation
 	personalInformationRepository := repository.NewPersonalInformationRepository(db)
 	personalInformationService := service.NewPersonalInformationService(personalInformationRepository)
 	personalInformationHandler := handler.NewPersonalInformationHandler(personalInformationService)
+
+	// Certificate
+	certificateRepository := repository.NewCertificateRepository(db)
+	certificateService := service.NewCertificateService(certificateRepository)
+	certificateHandler := handler.NewCertificateHandler(certificateService)
 
 	return &Handlers{
 		JobTitleHandler:            *jobTitleHandler,
 		SocialMediaHandler:         *socialMediaHandler,
 		PersonalInformationHandler: *personalInformationHandler,
+		CertificateHandler:         *certificateHandler,
 	}
 }
 
@@ -80,6 +87,24 @@ func setupRoutes(handler Handlers) *gin.Engine {
 	personalInformation.POST("", handler.PersonalInformationHandler.Create)
 	personalInformation.PATCH("/:id", handler.PersonalInformationHandler.Update)
 	personalInformation.DELETE("/:id", handler.PersonalInformationHandler.Delete)
+
+	// Certificate
+	certificate := api.Group("/certificates")
+	certificate.GET("", func(c *gin.Context) {
+		title := c.Query("title")
+		issuer := c.Query("issuer")
+		if title != "" {
+			handler.CertificateHandler.GetByTitle(c)
+		} else if issuer != "" {
+			handler.CertificateHandler.GetByIssuer(c)
+		} else {
+			handler.CertificateHandler.GetAll(c)
+		}
+	})
+	certificate.GET("/:id", handler.CertificateHandler.GetById)
+	certificate.POST("", handler.CertificateHandler.Create)
+	certificate.PATCH("/:id", handler.CertificateHandler.Update)
+	certificate.DELETE("/:id", handler.CertificateHandler.Delete)
 
 	return router
 }
