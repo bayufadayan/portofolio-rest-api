@@ -17,6 +17,7 @@ type Handlers struct {
 	PersonalInformationHandler handler.PersonalInformationHandler
 	CertificateHandler         handler.CertificateHandler
 	SkillHandler               handler.SkillHandler
+	ExperienceHandler          handler.ExperienceHandler
 }
 
 func InitRoutes(db *gorm.DB) *gin.Engine {
@@ -49,12 +50,18 @@ func initHandler(db *gorm.DB) *Handlers {
 	skillService := service.NewSkillService(skillRepository)
 	skillHandler := handler.NewSkillHandler(skillService)
 
+	// Experience
+	experienceRepository := repository.NewExperienceRepository(db)
+	experienceService := service.NewExperienceService(experienceRepository)
+	experienceHandler := handler.NewExperienceHandler(experienceService)
+
 	return &Handlers{
 		JobTitleHandler:            *jobTitleHandler,
 		SocialMediaHandler:         *socialMediaHandler,
 		PersonalInformationHandler: *personalInformationHandler,
 		CertificateHandler:         *certificateHandler,
 		SkillHandler:               *skillHandler,
+		ExperienceHandler:          *experienceHandler,
 	}
 }
 
@@ -127,6 +134,24 @@ func setupRoutes(handler Handlers) *gin.Engine {
 	skill.POST("", handler.SkillHandler.Create)
 	skill.PATCH("/:id", handler.SkillHandler.Update)
 	skill.DELETE("/:id", handler.SkillHandler.Delete)
+
+	// Experience
+	experience := api.Group("/experiences")
+	experience.GET("", func(c *gin.Context) {
+		title := c.Query("title")
+		company := c.Query("company")
+		if title != "" {
+			handler.ExperienceHandler.GetByTitle(c)
+		} else if company != "" {
+			handler.ExperienceHandler.GetByCompany(c)
+		} else {
+			handler.ExperienceHandler.GetAll(c)
+		}
+	})
+	experience.GET("/:id", handler.ExperienceHandler.GetById)
+	experience.POST("", handler.ExperienceHandler.Create)
+	experience.PATCH("/:id", handler.ExperienceHandler.Update)
+	experience.DELETE("/:id", handler.ExperienceHandler.Delete)
 
 	return router
 }
