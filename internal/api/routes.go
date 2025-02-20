@@ -18,6 +18,7 @@ type Handlers struct {
 	CertificateHandler         handler.CertificateHandler
 	SkillHandler               handler.SkillHandler
 	ExperienceHandler          handler.ExperienceHandler
+	ActivityHandler            handler.ActivityHandler
 }
 
 func InitRoutes(db *gorm.DB) *gin.Engine {
@@ -55,6 +56,11 @@ func initHandler(db *gorm.DB) *Handlers {
 	experienceService := service.NewExperienceService(experienceRepository)
 	experienceHandler := handler.NewExperienceHandler(experienceService)
 
+	// Activity
+	activityRepository := repository.NewActivityRepository(db)
+	activityService := service.NewActivityService(activityRepository)
+	activityHandler := handler.NewActivityHandler(activityService)
+
 	return &Handlers{
 		JobTitleHandler:            *jobTitleHandler,
 		SocialMediaHandler:         *socialMediaHandler,
@@ -62,6 +68,7 @@ func initHandler(db *gorm.DB) *Handlers {
 		CertificateHandler:         *certificateHandler,
 		SkillHandler:               *skillHandler,
 		ExperienceHandler:          *experienceHandler,
+		ActivityHandler:            *activityHandler,
 	}
 }
 
@@ -152,6 +159,27 @@ func setupRoutes(handler Handlers) *gin.Engine {
 	experience.POST("", handler.ExperienceHandler.Create)
 	experience.PATCH("/:id", handler.ExperienceHandler.Update)
 	experience.DELETE("/:id", handler.ExperienceHandler.Delete)
+
+	// Activity
+	activity := api.Group("/activities")
+	activity.GET("", func(c *gin.Context) {
+		title := c.Query("title")
+		organizer := c.Query("organizer")
+		tipe := c.Query("type")
+		if title != "" {
+			handler.ActivityHandler.GetByTitle(c)
+		} else if organizer != "" {
+			handler.ActivityHandler.GetByOrganizer(c)
+		} else if tipe != "" {
+			handler.ActivityHandler.GetByType(c)
+		} else {
+			handler.ActivityHandler.GetAll(c)
+		}
+	})
+	activity.GET("/:id", handler.ActivityHandler.GetById)
+	activity.DELETE("/:id", handler.ActivityHandler.Delete)
+	activity.POST("", handler.ActivityHandler.Create)
+	activity.PATCH("/:id", handler.ActivityHandler.Update)
 
 	return router
 }
