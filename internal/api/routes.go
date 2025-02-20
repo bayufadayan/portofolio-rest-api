@@ -19,6 +19,7 @@ type Handlers struct {
 	SkillHandler               handler.SkillHandler
 	ExperienceHandler          handler.ExperienceHandler
 	ActivityHandler            handler.ActivityHandler
+	EducationHandler           handler.EducationHandler
 }
 
 func InitRoutes(db *gorm.DB) *gin.Engine {
@@ -61,6 +62,11 @@ func initHandler(db *gorm.DB) *Handlers {
 	activityService := service.NewActivityService(activityRepository)
 	activityHandler := handler.NewActivityHandler(activityService)
 
+	// Education
+	educationRepository := repository.NewEducationRepository(db)
+	educationService := service.NewEducationService(educationRepository)
+	educationHandler := handler.NewEducationHandler(educationService)
+
 	return &Handlers{
 		JobTitleHandler:            *jobTitleHandler,
 		SocialMediaHandler:         *socialMediaHandler,
@@ -69,6 +75,7 @@ func initHandler(db *gorm.DB) *Handlers {
 		SkillHandler:               *skillHandler,
 		ExperienceHandler:          *experienceHandler,
 		ActivityHandler:            *activityHandler,
+		EducationHandler:           *educationHandler,
 	}
 }
 
@@ -180,6 +187,14 @@ func setupRoutes(handler Handlers) *gin.Engine {
 	activity.DELETE("/:id", handler.ActivityHandler.Delete)
 	activity.POST("", handler.ActivityHandler.Create)
 	activity.PATCH("/:id", handler.ActivityHandler.Update)
+
+	// Education
+	education := api.Group("/educations")
+	education.GET("", handler.EducationHandler.GetAll)
+	education.GET("/:id", handler.EducationHandler.GetById)
+	education.DELETE("/:id", handler.EducationHandler.Delete)
+	education.POST("", handler.EducationHandler.Create)
+	education.PATCH("/:id", handler.EducationHandler.Update)
 
 	return router
 }
