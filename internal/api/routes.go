@@ -20,6 +20,7 @@ type Handlers struct {
 	ExperienceHandler          handler.ExperienceHandler
 	ActivityHandler            handler.ActivityHandler
 	EducationHandler           handler.EducationHandler
+	ProjectCategoryHandler           handler.ProjectCategoryHandler
 }
 
 func InitRoutes(db *gorm.DB) *gin.Engine {
@@ -67,6 +68,11 @@ func initHandler(db *gorm.DB) *Handlers {
 	educationService := service.NewEducationService(educationRepository)
 	educationHandler := handler.NewEducationHandler(educationService)
 
+	// ProjectCategory
+	projectCategoryRepository := repository.NewProjectCategoryRepository(db)
+	projectCategoryService := service.NewProjectCategoryService(projectCategoryRepository)
+	projectCategoryHandler := handler.NewProjectCategoryHandler(projectCategoryService)
+
 	return &Handlers{
 		JobTitleHandler:            *jobTitleHandler,
 		SocialMediaHandler:         *socialMediaHandler,
@@ -76,6 +82,7 @@ func initHandler(db *gorm.DB) *Handlers {
 		ExperienceHandler:          *experienceHandler,
 		ActivityHandler:            *activityHandler,
 		EducationHandler:           *educationHandler,
+		ProjectCategoryHandler:           *projectCategoryHandler,
 	}
 }
 
@@ -195,6 +202,14 @@ func setupRoutes(handler Handlers) *gin.Engine {
 	education.DELETE("/:id", handler.EducationHandler.Delete)
 	education.POST("", handler.EducationHandler.Create)
 	education.PATCH("/:id", handler.EducationHandler.Update)
+
+	// ProjectCategory
+	projectCategory := api.Group("/project-categories")
+	projectCategory.GET("", handler.ProjectCategoryHandler.GetAll)
+	projectCategory.GET("/:id", handler.ProjectCategoryHandler.GetById)
+	projectCategory.POST("", handler.ProjectCategoryHandler.Create)
+	projectCategory.PATCH("/:id", handler.ProjectCategoryHandler.Update)
+	projectCategory.DELETE("/:id", handler.ProjectCategoryHandler.Delete)
 
 	return router
 }
