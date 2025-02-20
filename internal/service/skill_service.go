@@ -12,6 +12,7 @@ type SkillService interface {
 	GetByName(name string) ([]models.Skill, error)
 	Create(skill *models.Skill) error
 	Update(id uint, updates map[string]interface{}) error
+	Delete(id uint) error
 }
 
 type skillService struct {
@@ -45,4 +46,8 @@ func (s *skillService) Update(id uint, updates map[string]interface{}) error {
 	}
 
 	return s.repo.Update(existing.ID, updates)
+}
+
+func (s *skillService) Delete(id uint) error {
+	return s.repo.Delete(id)
 }

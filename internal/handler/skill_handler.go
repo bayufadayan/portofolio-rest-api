@@ -34,13 +34,13 @@ func (h *SkillHandler) GetById(c *gin.Context) {
 		return
 	}
 
-	certificate, err := h.service.GetById(uint(id))
+	skill, err := h.service.GetById(uint(id))
 	if err != nil {
 		c.JSON(http.StatusNotFound, gin.H{"error": "skill not found"})
 		return
 	}
 
-	c.JSON(http.StatusOK, certificate)
+	c.JSON(http.StatusOK, skill)
 }
 
 func (h *SkillHandler) GetByName(c *gin.Context) {
@@ -73,7 +73,7 @@ func (h *SkillHandler) Create(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusCreated, gin.H{
-		"message": "certificate created successfully",
+		"message": "skill created successfully",
 		"data":    skill,
 	})
 }
@@ -108,7 +108,7 @@ func (h *SkillHandler) Update(c *gin.Context) {
 	err = h.service.Update(uint(id), updates)
 	if err != nil {
 		switch err.Error() {
-		case "certificate not found":
+		case "skill not found":
 			c.JSON(http.StatusNotFound, gin.H{"error": err.Error()})
 		default:
 			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
@@ -116,5 +116,25 @@ func (h *SkillHandler) Update(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, gin.H{"message": "certificate updated successfully"})
+	c.JSON(http.StatusOK, gin.H{"message": "skill updated successfully"})
+}
+
+func (h *SkillHandler) Delete(c *gin.Context) {
+	id, err := getIDParam(c)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid ID"})
+		return
+	}
+
+	if _, err := h.service.GetById(id); err != nil {
+		c.JSON(http.StatusNotFound, gin.H{"error": "skill not found"})
+		return
+	}
+
+	if err := h.service.Delete(id); err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to delete skill"})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{"message": "skill deleted successfully"})
 }

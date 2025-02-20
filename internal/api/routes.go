@@ -126,6 +126,7 @@ func setupRoutes(handler Handlers) *gin.Engine {
 	skill.GET("/:id", handler.SkillHandler.GetById)
 	skill.POST("", handler.SkillHandler.Create)
 	skill.PATCH("/:id", handler.SkillHandler.Update)
+	skill.DELETE("/:id", handler.SkillHandler.Delete)
 
 	return router
 }

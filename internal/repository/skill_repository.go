@@ -12,7 +12,7 @@ type SkillRepository interface {
 	GetByName(name string) ([]models.Skill, error)
 	Create(skill *models.Skill) error
 	Update(id uint, updates map[string]interface{}) error
-	// delete
+	Delete(id uint) error
 }
 
 type skillRepository struct {
@@ -57,3 +57,11 @@ func (r *skillRepository) Update(id uint, updates map[string]interface{}) error 
 	return r.db.Model(&models.Skill{}).Where("id = ?", id).Updates(updates).Error
 }
 
+func (r *skillRepository) Delete(id uint) error {
+    var skill models.Skill
+    if err := r.db.First(&skill, id).Error; err != nil {
+        return err
+    }
+
+    return r.db.Delete(&skill).Error
+}
