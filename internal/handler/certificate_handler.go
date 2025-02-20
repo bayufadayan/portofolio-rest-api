@@ -3,10 +3,6 @@ package handler
 import (
 	"net/http"
 	"strconv"
-
-	// "strconv"
-
-	// "portofolio-rest-api/internal/models"
 	"portofolio-rest-api/internal/models"
 	"portofolio-rest-api/internal/service"
 
