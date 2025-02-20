@@ -16,6 +16,7 @@ type Handlers struct {
 	SocialMediaHandler         handler.SocialMediaHandler
 	PersonalInformationHandler handler.PersonalInformationHandler
 	CertificateHandler         handler.CertificateHandler
+	SkillHandler               handler.SkillHandler
 }
 
 func InitRoutes(db *gorm.DB) *gin.Engine {
@@ -43,11 +44,17 @@ func initHandler(db *gorm.DB) *Handlers {
 	certificateService := service.NewCertificateService(certificateRepository)
 	certificateHandler := handler.NewCertificateHandler(certificateService)
 
+	// Skill
+	skillRepository := repository.NewSkillRepository(db)
+	skillService := service.NewSkillService(skillRepository)
+	skillHandler := handler.NewSkillHandler(skillService)
+
 	return &Handlers{
 		JobTitleHandler:            *jobTitleHandler,
 		SocialMediaHandler:         *socialMediaHandler,
 		PersonalInformationHandler: *personalInformationHandler,
 		CertificateHandler:         *certificateHandler,
+		SkillHandler:               *skillHandler,
 	}
 }
 
@@ -105,6 +112,20 @@ func setupRoutes(handler Handlers) *gin.Engine {
 	certificate.POST("", handler.CertificateHandler.Create)
 	certificate.PATCH("/:id", handler.CertificateHandler.Update)
 	certificate.DELETE("/:id", handler.CertificateHandler.Delete)
+
+	// Skill
+	skill := api.Group("/skills")
+	skill.GET("", func(c *gin.Context) {
+		name := c.Query("name")
+		if name != "" {
+			handler.SkillHandler.GetByName(c)
+		} else {
+			handler.SkillHandler.GetAll(c)
+		}
+	})
+	skill.GET("/:id", handler.SkillHandler.GetById)
+	skill.POST("", handler.SkillHandler.Create)
+	skill.PATCH("/:id", handler.SkillHandler.Update)
 
 	return router
 }
