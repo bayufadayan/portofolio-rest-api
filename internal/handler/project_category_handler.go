@@ -85,7 +85,7 @@ func (h *ProjectCategoryHandler) Update(c *gin.Context) {
 	err = h.service.Update(uint(id), updates)
 	if err != nil {
 		switch err.Error() {
-		case "personal information not found":
+		case "project category not found":
 			c.JSON(http.StatusNotFound, gin.H{"error": err.Error()})
 		default:
 			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
@@ -93,7 +93,7 @@ func (h *ProjectCategoryHandler) Update(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, gin.H{"message": "personal information updated successfully"})
+	c.JSON(http.StatusOK, gin.H{"message": "project category updated successfully"})
 }
 
 func (h *ProjectCategoryHandler) Delete(c *gin.Context) {
@@ -104,14 +104,14 @@ func (h *ProjectCategoryHandler) Delete(c *gin.Context) {
 	}
 
 	if _, err := h.service.GetById(id); err != nil {
-		c.JSON(http.StatusNotFound, gin.H{"error": "personal information not found"})
+		c.JSON(http.StatusNotFound, gin.H{"error": "project category not found"})
 		return
 	}
 
 	if err := h.service.Delete(id); err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to delete personal information"})
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to delete project category"})
 		return
 	}
 
-	c.JSON(http.StatusOK, gin.H{"message": "personal information deleted successfully"})
+	c.JSON(http.StatusOK, gin.H{"message": "project category deleted successfully"})
 }

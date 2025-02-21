@@ -20,7 +20,8 @@ type Handlers struct {
 	ExperienceHandler          handler.ExperienceHandler
 	ActivityHandler            handler.ActivityHandler
 	EducationHandler           handler.EducationHandler
-	ProjectCategoryHandler           handler.ProjectCategoryHandler
+	ProjectCategoryHandler     handler.ProjectCategoryHandler
+	ProjectHandler             handler.ProjectHandler
 }
 
 func InitRoutes(db *gorm.DB) *gin.Engine {
@@ -73,6 +74,11 @@ func initHandler(db *gorm.DB) *Handlers {
 	projectCategoryService := service.NewProjectCategoryService(projectCategoryRepository)
 	projectCategoryHandler := handler.NewProjectCategoryHandler(projectCategoryService)
 
+	// Project
+	projectRepository := repository.NewProjectRepository(db)
+	projectService := service.NewProjectService(projectRepository)
+	projectHandler := handler.NewProjectHandler(projectService)
+
 	return &Handlers{
 		JobTitleHandler:            *jobTitleHandler,
 		SocialMediaHandler:         *socialMediaHandler,
@@ -82,7 +88,8 @@ func initHandler(db *gorm.DB) *Handlers {
 		ExperienceHandler:          *experienceHandler,
 		ActivityHandler:            *activityHandler,
 		EducationHandler:           *educationHandler,
-		ProjectCategoryHandler:           *projectCategoryHandler,
+		ProjectCategoryHandler:     *projectCategoryHandler,
+		ProjectHandler:             *projectHandler,
 	}
 }
 
@@ -210,6 +217,21 @@ func setupRoutes(handler Handlers) *gin.Engine {
 	projectCategory.POST("", handler.ProjectCategoryHandler.Create)
 	projectCategory.PATCH("/:id", handler.ProjectCategoryHandler.Update)
 	projectCategory.DELETE("/:id", handler.ProjectCategoryHandler.Delete)
+
+	// Project
+	project := api.Group("/projects")
+	project.GET("", func(c *gin.Context) {
+		title := c.Query("title")
+		if title != "" {
+			handler.ProjectHandler.GetByTitle(c)
+		} else {
+			handler.ProjectHandler.GetAll(c)
+		}
+	})
+	project.GET("/:id", handler.ProjectHandler.GetById)
+	project.POST("", handler.ProjectHandler.Create)
+	project.PATCH("/:id", handler.ProjectHandler.Update)
+	project.DELETE("/:id", handler.ProjectHandler.Delete)
 
 	return router
 }
