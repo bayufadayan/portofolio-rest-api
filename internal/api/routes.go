@@ -2,11 +2,13 @@ package api
 
 import (
 	"net/http"
+	"time"
 
 	"portofolio-rest-api/internal/handler"
 	"portofolio-rest-api/internal/repository"
 	"portofolio-rest-api/internal/service"
 
+	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 	"gorm.io/gorm"
 )
@@ -95,6 +97,13 @@ func initHandler(db *gorm.DB) *Handlers {
 
 func setupRoutes(handler Handlers) *gin.Engine {
 	router := gin.Default()
+	router.Use(cors.New(cors.Config{
+		AllowOrigins:     []string{"*"},
+		AllowMethods:     []string{"GET", "POST", "PUT", "DELETE", "PATCH"},
+		AllowHeaders:     []string{"Content-Type"},
+		AllowCredentials: true,
+		MaxAge:           12 * time.Hour,
+	}))
 
 	api := router.Group("/api/v1")
 	api.GET("/ping", pingHandler)
