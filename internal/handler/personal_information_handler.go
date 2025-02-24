@@ -87,7 +87,14 @@ func (h *PersonalInformationHandler) Update(c *gin.Context) {
 
 	if url, ok := updates["profile_image"]; ok {
 		if !isValidURL(url.(string)) {
-			c.JSON(http.StatusBadRequest, gin.H{"error": "invalid URL format"})
+			c.JSON(http.StatusBadRequest, gin.H{"error": "invalid profile_image URL format"})
+			return
+		}
+	}
+
+	if url, ok := updates["resume_link"]; ok {
+		if !isValidURL(url.(string)) {
+			c.JSON(http.StatusBadRequest, gin.H{"error": "invalid resume_link URL format"})
 			return
 		}
 	}

@@ -91,13 +91,6 @@ func (h *SkillHandler) Update(c *gin.Context) {
 		return
 	}
 
-	if url, ok := updates["icon_url"]; ok {
-		if !isValidURL(url.(string)) {
-			c.JSON(http.StatusBadRequest, gin.H{"error": "invalid URL format"})
-			return
-		}
-	}
-
 	for key, value := range updates {
 		if value == "" {
 			c.JSON(http.StatusBadRequest, gin.H{"error": key + " cannot be empty"})

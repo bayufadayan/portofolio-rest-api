@@ -12,4 +12,5 @@ type PersonalInformation struct {
 	Address      string `json:"address" gorm:"type:text"`
 	Description  string `json:"description" gorm:"type:text"`
 	ProfileImage string `json:"profile_image" binding:"required,url" gorm:"type:varchar(255);not null"`
+	ResumeLink string `json:"resume_link" binding:"required,url" gorm:"type:varchar(255);not null"`
 }

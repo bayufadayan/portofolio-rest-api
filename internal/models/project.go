@@ -13,4 +13,5 @@ type Project struct {
 	RepoURL           string          `json:"repo_url" binding:"required,url" gorm:"type:varchar(255);not null"`
 	DemoURL           string          `json:"demo_url" binding:"omitempty,url" gorm:"type:varchar(255)"`
 	DemoVideo         string          `json:"demo_video" binding:"omitempty,url" gorm:"type:varchar(255)"`
+	Thumbnail         string          `json:"thumbnail" binding:"omitempty,url" gorm:"type:varchar(255)"`
 }
